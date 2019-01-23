@@ -2,55 +2,51 @@ package com.company;
 
 import java.util.*;
 
-/**
- * Created by Lobster on 02.01.17.
- */
 public class Graph {
-
     private List<Vertex> vertices;
     private int edgeCount;
     public int involvedVertices;
 
-    public Graph(List<Edge> edges, Map<Vertex, Set<Edge>> vertices){
+    public Graph(List<Edge> edges, Map<Vertex, Set<Edge>> vertices) {
         edgeCount = edges.size();
         this.vertices = setVerices(edges, vertices);
     }
 
-    private List<Vertex> setVerices(List<Edge> edges, Map<Vertex, Set<Edge>> vertices){
-        for (Edge e: edges) {
+    private List<Vertex> setVerices(List<Edge> edges, Map<Vertex, Set<Edge>> vertices) {
+        for (Edge e : edges) {
             vertices.get(e.getLeftVertex()).add(e);
             vertices.get(e.getRightVertex()).add(e);
         }
 
         Set<Vertex> vertexSet = new HashSet<>();
 
-        for (Map.Entry<Vertex, Set<Edge>> m: vertices.entrySet()){
+        for (Map.Entry<Vertex, Set<Edge>> m : vertices.entrySet()) {
             vertexSet.add(new Vertex(m.getKey().get(), m.getValue()));
         }
 
         return new ArrayList<>(vertexSet);
     }
 
-    public void showGraph(){
-        for (Vertex v: vertices){
+    public void showGraph() {
+        for (Vertex v : vertices) {
             System.out.println(v.get() + ": " + v.getEdges());
         }
     }
 
-    public int sizeVertex(){
+    public int sizeVertex() {
         return vertices.size();
     }
 
-    public int sizeEdges(){
+    public int sizeEdges() {
         return edgeCount;
     }
 
-    public int covered(List<Integer> solution){
+    public int covered(List<Integer> solution) {
         involvedVertices = 0;
         Set<Edge> edges = new HashSet<>();
 
-        for (int i = 0; i < solution.size(); i++){
-            if (solution.get(i) == 1){
+        for (int i = 0; i < solution.size(); i++) {
+            if (solution.get(i) == 1) {
                 edges.addAll(vertices.get(i).getEdges());
                 involvedVertices++;
             }

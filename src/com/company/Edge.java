@@ -1,8 +1,5 @@
 package com.company;
 
-/**
- * Created by Lobster on 31.12.16.
- */
 public class Edge {
 
     private Vertex v1;

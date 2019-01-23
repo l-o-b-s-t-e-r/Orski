@@ -2,9 +2,6 @@ package com.company;
 
 import java.util.Set;
 
-/**
- * Created by Lobster on 02.01.17.
- */
 public class Vertex {
 
     private int vertex;
