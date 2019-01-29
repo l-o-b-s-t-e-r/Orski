@@ -22,24 +22,33 @@ public class Controller {
     private Integer covered, candidates, bestCandidatesCount, parentsCountPerChild, childCountFromParents, mutationGenCount, maxLifeCyclesNumber;
     private Float genGenerateProbability, crossOverProbability, mutationProbability;
     private XYChart.Series series;
-    private String dataSetPath = "/Users/macos/geneticAlgorithm/test_4.mis";
+    private String dataSetPath = "/Users/macos/Downloads/frb30-15-mis/frb30-15-1.mis";
     private int MAX_CYCLES = 50;
+    private List<Result> results = new ArrayList<>();
 
     public void loadDataSet() {
-        series = new XYChart.Series();
-        chart.getXAxis().setLabel("Life Cycle #");
-        chart.getYAxis().setLabel("Function");
-        init();
-        loadGraph();
-        startAlgorithm();
-        chart.getData().add(series);
+        for (int i = 0; i < 10; i++) {
+            series = new XYChart.Series();
+            chart.getXAxis().setLabel("Life Cycle #");
+            chart.getYAxis().setLabel("Function");
+            init();
+            loadGraph();
+            startAlgorithm();
+            chart.getData().clear();
+            chart.getData().add(series);
+        }
+
+        Result avgResult = Result.calculateAVG(results);
+        results.add(avgResult);
+        for (Result r: results) {
+            System.out.println(r.toString());
+        }
     }
 
     private void init() {
         genGenerateProbability = 0.5f;
         crossOverProbability = 0.5f;
         mutationProbability = 0.05f;
-
         parentsCountPerChild = 2;
         childCountFromParents = 1;
         candidates = 12;
@@ -75,6 +84,7 @@ public class Controller {
         List<List<Integer>> candidatesList = generateCandidatesList();
 
         int bestF = 0;
+        int bestCandidateF = Integer.MAX_VALUE;
         int countSameF = 0;
         List<List<Integer>> bestCandidate;
 
@@ -107,6 +117,7 @@ public class Controller {
         int i = 0;
         List<List<Integer>> children = new ArrayList<>();
         while (countSameF < maxLifeCyclesNumber && i < MAX_CYCLES) {
+            bestCandidateF = Integer.MAX_VALUE;
             System.out.println("=====================================================================================");
             System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
             System.out.println("Life cycle: " + ++i);
@@ -145,6 +156,10 @@ public class Controller {
                 Integer f = F(s, graph);
                 sumFofbestCandidate += f;
 
+                if (f < bestCandidateF) {
+                    bestCandidateF = f;
+                }
+
                 System.out.println("F: " + f + " covered/uncovered: " + covered + "/" + (graph.sizeEdges() - covered) + " - " + graph.involvedVertices + " || solution: " + s);
             }
             series.getData().add(new XYChart.Data(String.valueOf(i), sumFofbestCandidate));
@@ -159,7 +174,10 @@ public class Controller {
         System.out.println("");
         System.out.println("");
         System.out.println("====================================================");
-        System.out.println("Czas wykonania = " + ((double) (System.currentTimeMillis() - runTime) / 1000) + " sek.");
+        double time = ((double) (System.currentTimeMillis() - runTime) / 1000);
+        System.out.println("Czas wykonania = " + time + " sek.");
+
+        results.add(new Result(time, i, bestCandidateF, bestF, findDifferentSolutions()));
     }
 
     private List<List<Integer>> generateCandidatesList() {
@@ -292,5 +310,9 @@ public class Controller {
     private int F(List<Integer> solution, Graph graph) {
         covered = graph.covered(solution);
         return covered + ALPHA * (graph.sizeEdges() - covered) + graph.involvedVertices;
+    }
+
+    private int findDifferentSolutions() {
+        return new HashSet<List<Integer>>(bestCandidatesList).size();
     }
 }
